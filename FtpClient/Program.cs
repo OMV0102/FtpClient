@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,46 +13,46 @@ namespace FtpClient
         [STAThread]
         static void Main(string[] args)
         {
-            while (true)
+
+            string host = "";
+            string user = "";
+            string password = "";
+            Console.WriteLine("Введите адрес сервера, имя пользователя и пароль для подключения к серверу FTP");
+            /*Console.Write("Сервер: ");
+            host = Console.ReadLine();
+            Console.Write("Пользователь: ");
+            user = Console.ReadLine();
+            Console.Write("Пароль: ");
+            password = Console.ReadLine();*/
+
+            host = "fpm2.ami.nstu.ru";
+            user = "pmi-b6603";
+            password = "BeSwulj5";
+            //ftp://pmi-b6603:BeSwulj50@fpm2.ami.nstu.ru
+
+            FTPClient client = new FTPClient(host, user, password);
+            try
             {
-                string host = "";
-                string user = "";
-                string password = "";
-                Console.WriteLine("Введите адрес сервера, имя пользователя и пароль для подключения к серверу FTP");
-                /*Console.Write("Сервер: ");
-                host = Console.ReadLine();
-                Console.Write("Пользователь: ");
-                user = Console.ReadLine();
-                Console.Write("Пароль: ");
-                password = Console.ReadLine();*/
-
-                host = "fpm2.ami.nstu.ru";
-                user = "pmi-b6603";
-                password = "BeSwulj56";
-                //ftp://pmi-b6603:BeSwulj50@fpm2.ami.nstu.ru
-
-                FTPClient client = new FTPClient(host, user, password);
-                try
+                Console.WriteLine("Идет открытие соединения, пожалуйста подождите...");
+                client.openConnection();
+                if(client.getStatusConnection() == false)
                 {
-                    Console.WriteLine("Идет открытие соединения, пожалуйста подождите...");
-                    client.openConnection();
-                    if(client.getStatusConnection() == false)
-                    {
-                        Console.WriteLine("Не удалось открыть соединение по введенным параметрам!");
-                        Console.WriteLine("Завершение работы(нажмите Enter)...");
-                        Console.ReadLine();
-                        Environment.Exit(1);
-                    }
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Произошла ошибка при открытии соединения!");
-                    Console.WriteLine("Сообщение об ошибке:\n"+e.Message);
+                    Console.WriteLine("Не удалось открыть соединение по введенным параметрам!");
                     Console.WriteLine("Завершение работы(нажмите Enter)...");
                     Console.ReadLine();
                     Environment.Exit(1);
                 }
-
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Произошла ошибка при открытии соединения!");
+                Console.WriteLine("Сообщение об ошибке:\n"+e.Message);
+                Console.WriteLine("Завершение работы(нажмите Enter)...");
+                Console.ReadLine();
+                Environment.Exit(1);
+            }
+            while (true) 
+            { 
                 Program.printMenu();
 
                 Console.WriteLine("[" + client.getCurrentDirectory() + "]");
@@ -67,23 +68,79 @@ namespace FtpClient
                 {
                     switch (Number)
                     {
-                        case 1:
+                        case 1: // Создать каталог
                         {
+                            Console.Write("Введите имя нового каталога: ");
+                            string nameDirectory = Console.ReadLine();
+                            string fullPath = client.getCurrentDirectory() +"/"+ nameDirectory;
+                            bool result = true;
+                            if (!client.CheckExistDirectory(fullPath))
+                            {
+                                result = client.createDirectory(fullPath); // создали в текущем каталоге
+                                if(!result)
+                                    Console.WriteLine("Произошла ошибка при создании нового каталога!");
+                                else
+                                    Console.WriteLine("Создан новый каталог: " + fullPath);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Каталог с таким именем уже существует!");
+                            }
+                            
                             break;
                         }
-                        case 2:
+                        case 2: // Удалить каталог
                         {
+                            Console.Write("Введите имя удаляемого каталога: ");
+                            string nameDirectory = Console.ReadLine();
+                            string fullPath = client.getCurrentDirectory() + "/" + nameDirectory;
+                            bool result = true;
+                            if (client.CheckExistDirectory(fullPath))
+                            {
+                                result = client.deleteDirectory(fullPath); // удалили
+                                if (!result)
+                                    Console.WriteLine("Произошла ошибка при удалении указаного каталога!");
+                                else
+                                    Console.WriteLine("Каталог [" + fullPath+"] удален.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Каталога с таким именем НЕ существует!");
+                            }
+
                             break;
                         }
-                        case 3:
+                        case 3: // Перейти в родительский каталог
                         {
+                            bool result = true;
+                            client.changeDirrectoryOnParent();
+                            if (!result)
+                                Console.WriteLine("Произошла ошибка при переходе в родительский каталог!");
+                            else
+                                Console.WriteLine("Вы перешли в каталог " + client.getCurrentDirectory() + ".");
                             break;
                         }
-                        case 4:
+                        case 4: // Перейти в указаный каталог
                         {
+                            Console.Write("Введите имя каталога для перехода: ");
+                            string nameDirectory = Console.ReadLine();
+                            string fullPath = client.getCurrentDirectory() + "/" + nameDirectory;
+                            bool result = true;
+                            if (client.CheckExistDirectory(fullPath))
+                            {
+                                result = client.changeDirectory(fullPath); // создали в текущем каталоге
+                                if (!result)
+                                    Console.WriteLine("Произошла ошибка при переходе в указанный каталог!");
+                                else
+                                    Console.WriteLine("Вы перешли в каталог " + client.getCurrentDirectory() + ".");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Каталога с таким именем НЕ существует!");
+                            }
                             break;
                         }
-                        case 5:
+                        case 5: //Показать содержимое текущего каталога
                         {
                             string[] listFiles;
                             listFiles = client.getListFiles();
@@ -102,23 +159,76 @@ namespace FtpClient
 
                             break;
                         }
-                        case 6:
+                        case 6: //Получить указаный файл
                         {
+
                             break;
                         }
-                        case 7:
+                        case 7: //Загрузить файл на сервер
                         {
+                            bool result = true;
+                            string fileNameLocal = "";
+                            string fileNameRemote = "";
+                            result = Program.Upload(out fileNameLocal);
+                            if (File.Exists(fileNameLocal))
+                            {
+                                fileNameRemote = client.getCurrentDirectory() + "/"+ fileNameLocal.Substring(fileNameLocal.LastIndexOf('/'));
+                                result = client.UploadFile(fileNameLocal, fileNameRemote); // загрузили
+                                if (!result)
+                                    Console.WriteLine("Произошла ошибка при загрузке файла на сервер!");
+                                else
+                                    Console.WriteLine("Файл " + fileNameLocal.Substring(fileNameLocal.LastIndexOf('/')) + " загружен в ["+ fileNameRemote+"] удален.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Локального файла с таким именем НЕ существует!");
+                            }
                             break;
                         }
-                        case 8:
+                        case 8: //Удалить указаный файл
                         {
+                            Console.Write("Введите имя удаляемого файла: ");
+                            string nameFile = Console.ReadLine();
+                            string fullPath = client.getCurrentDirectory() + "/" + nameFile;
+                            bool result = true;
+                            if (client.CheckExistFile(fullPath))
+                            {
+                                result = client.deleteFile(fullPath); // удалили
+                                if (!result)
+                                    Console.WriteLine("Произошла ошибка при удалении указаного файла!");
+                                else
+                                    Console.WriteLine("Файл [" + fullPath + "] удален.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Файла с таким именем НЕ существует!");
+                            }
                             break;
                         }
-                        case 9:
+                        case 9: //Переименовать указаный файл
                         {
+                            Console.Write("Введите текущее имя файла: ");
+                            string nameFileOld = Console.ReadLine();
+                            string fullPathOld = client.getCurrentDirectory() + "/" + nameFileOld;
+                            Console.Write("Введите новое имя текущего файла для переименования: ");
+                            string nameFileNew = Console.ReadLine();
+                            string fullPathNew = client.getCurrentDirectory() + "/" + nameFileNew;
+                            bool result = true;
+                            if (client.CheckExistFile(fullPathOld))
+                            {
+                                result = client.RenameFile(fullPathOld, fullPathNew); // переименовали
+                                if (!result)
+                                    Console.WriteLine("Произошла ошибка при переименовании файла [" + fullPathOld + "] !");
+                                else
+                                    Console.WriteLine("Файл [" + fullPathOld + "] переменован в [" + fullPathNew + "].");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Файла с таким именем НЕ существует!");
+                            }
                             break;
                         }
-                        case 0:
+                        case 0: //Выход
                         {
                             client.closeConnection();
                             Environment.Exit(0);
@@ -126,11 +236,12 @@ namespace FtpClient
                         }
                         default:
                         {
+                            Console.WriteLine("Введен некоректный номер пункта меню!");
                             break;
                         }
                     }
                 }
-                Console.WriteLine("\t\tДействие выполнено успешно");
+                //Console.WriteLine("\t\tДействие выполнено успешно");
                 Console.WriteLine("=========================================================");
             }
         }
@@ -154,10 +265,8 @@ namespace FtpClient
         }
 
         // Выбор файла
-        public static bool Upload(string fileName, out string fileNameLocal)
+        public static bool Upload(out string fileNameLocal)
         {
-            string Name = fileName.Substring(fileName.LastIndexOf('/'));
-
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Выберите файл ..."; // Заголовок окна
             ofd.InitialDirectory = Application.StartupPath; // путь откуда запустили

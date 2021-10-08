@@ -85,6 +85,10 @@ namespace FtpClient
         // сменить текущий каталог
         public bool changeDirectory(string newDirectory)
         {
+            if (!newDirectory.Contains("./")) 
+            {
+                newDirectory = this.getCurrentDirectory() + "/" + newDirectory;
+            }
             return this.ftpConnection.ChangeWorkingDirectory(newDirectory);
         }
 
@@ -141,8 +145,8 @@ namespace FtpClient
             if (localFile.Length < 1 || remoteFile.Length < 1)
                 return false;
 
-            if (!remoteFile.Contains("/"))
-                remoteFile = this.getCurrentDirectory() + remoteFile;
+            if (!remoteFile.Contains("./"))
+                remoteFile = this.getCurrentDirectory() + "/"+ remoteFile;
 
             this.ftpConnection.UploadFile(localFile, remoteFile, false); // false - перезаписать файл
             return true;
@@ -154,20 +158,46 @@ namespace FtpClient
             if (localFile.Length < 1 || remoteFile.Length < 1)
                 return false;
 
-            if (!remoteFile.Contains("/"))
-                remoteFile = this.getCurrentDirectory() + remoteFile;
+            if (!remoteFile.Contains("./"))
+                remoteFile = this.getCurrentDirectory() + "/" + remoteFile;
 
             this.ftpConnection.DownloadFile(localFile, remoteFile);
             return true;
         } 
 
+        //переименовать файл
         public bool RenameFile(string oldName, string newName)
         {
             if (oldName.Length < 1 || newName.Length < 1)
                 return false;
-
+            if (!oldName.Contains("./"))
+            {
+                oldName = this.getCurrentDirectory() + "/" + oldName;
+            }
+            if (!newName.Contains("./"))
+            {
+                newName = this.getCurrentDirectory() + "/" + newName;
+            }
             this.ftpConnection.RenameFile(oldName, newName);
             return true;
+        }
+
+        // проверить существование файла
+        public bool CheckExistFile(string remoteFile)
+        {
+            if (remoteFile.Length < 1)
+                return false;
+
+            return this.ftpConnection.Exists(remoteFile);
+        }
+
+        // проверить существование каталога
+        public bool CheckExistDirectory(string remoteDirectory)
+        {
+            if (remoteDirectory.Length < 1)
+                return false;
+
+            return this.ftpConnection.DirectoryExists(remoteDirectory);
         }
     }
 }
