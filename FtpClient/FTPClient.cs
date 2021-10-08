@@ -11,7 +11,7 @@ namespace FtpClient
     {
         private FTPConnection ftpConnection;
 
-        FTPClient(string host, string user, string password)
+        public FTPClient(string host, string user, string password)
         {
             this.ftpConnection = new FTPConnection();
             this.ftpConnection.ServerAddress = host;
@@ -44,7 +44,7 @@ namespace FtpClient
             }
         }
 
-        // Открыть соединение
+        // открыть соединение
         public void openConnection()
         {
             this.ftpConnection.Connect();
@@ -54,6 +54,11 @@ namespace FtpClient
         public void closeConnection()
         {
             this.ftpConnection.Close();
+        }
+
+        public bool getStatusConnection()
+        {
+            return this.ftpConnection.IsConnected;
         }
 
         // получить текущий каталог
