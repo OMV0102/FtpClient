@@ -139,16 +139,29 @@ namespace FtpClient
             return true;
         }
 
-        //загрузка файла на сервер в указанную директорию
+        //загрузка файла на сервер по указаному пути
         public bool UploadFile(string localFile, string remoteFile)
         {
             if (localFile.Length < 1 || remoteFile.Length < 1)
                 return false;
 
-            if (!remoteFile.Contains("./"))
-                remoteFile = this.getCurrentDirectory() + "/"+ remoteFile;
+            //if (!remoteFile.Contains("./"))
+            //    remoteFile = this.getCurrentDirectory() + "/"+ remoteFile;
 
-            this.ftpConnection.UploadFile(localFile, remoteFile, false); // false - перезаписать файл
+            this.ftpConnection.UploadFile(localFile, remoteFile); // перезаписать файл
+            return true;
+        }
+
+        //загрузка байтов файла на сервер по указанному пути
+        public bool UploadFile(byte[] localFileByte, string remoteFile)
+        {
+            if (localFileByte.Length < 1 || remoteFile.Length < 1)
+                return false;
+
+            //if (!remoteFile.Contains("./"))
+            //    remoteFile = this.getCurrentDirectory() + "/" + remoteFile;
+
+            this.ftpConnection.UploadByteArray(localFileByte, remoteFile); // перезаписать файл
             return true;
         }
 

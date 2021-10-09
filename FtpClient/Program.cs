@@ -169,15 +169,18 @@ namespace FtpClient
                             bool result = true;
                             string fileNameLocal = "";
                             string fileNameRemote = "";
+                            byte[] fileLocalByte;
                             result = Program.Upload(out fileNameLocal);
                             if (File.Exists(fileNameLocal))
                             {
-                                fileNameRemote = client.getCurrentDirectory() + "/"+ fileNameLocal.Substring(fileNameLocal.LastIndexOf('/'));
-                                result = client.UploadFile(fileNameLocal, fileNameRemote); // загрузили
+                                fileNameRemote = client.getCurrentDirectory() + "/"+ fileNameLocal.Substring(fileNameLocal.LastIndexOf('\\')+1);
+                                //result = client.UploadFile(fileNameLocal, fileNameRemote); // загрузили
+                                fileLocalByte = File.ReadAllBytes(fileNameLocal);
+                                result = client.UploadFile(fileLocalByte, fileNameRemote); // загрузили
                                 if (!result)
                                     Console.WriteLine("Произошла ошибка при загрузке файла на сервер!");
                                 else
-                                    Console.WriteLine("Файл " + fileNameLocal.Substring(fileNameLocal.LastIndexOf('/')) + " загружен в ["+ fileNameRemote+"] удален.");
+                                    Console.WriteLine("Файл [" + fileNameLocal.Substring(fileNameLocal.LastIndexOf('\\')+1) + "] загружен в ["+ fileNameRemote+"].");
                             }
                             else
                             {
