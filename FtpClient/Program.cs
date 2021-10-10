@@ -18,17 +18,12 @@ namespace FtpClient
             string user = "";
             string password = "";
             Console.WriteLine("Введите адрес сервера, имя пользователя и пароль для подключения к серверу FTP");
-            /*Console.Write("Сервер: ");
+            Console.Write("Сервер: ");
             host = Console.ReadLine();
             Console.Write("Пользователь: ");
             user = Console.ReadLine();
             Console.Write("Пароль: ");
-            password = Console.ReadLine();*/
-
-            host = "fpm2.ami.nstu.ru";
-            user = "pmi-b6603";
-            password = "BeSwulj5";
-            //ftp://pmi-b6603:BeSwulj50@fpm2.ami.nstu.ru
+            password = Console.ReadLine();
 
             FTPClient client = new FTPClient(host, user, password);
             try
@@ -179,6 +174,7 @@ namespace FtpClient
 
                             if (client.CheckExistFile(fileNameRemote))
                             {
+                                Console.WriteLine("Выберите папку для сохранения в нее скачанного файла в диалоговом окне...");
                                 result = Program.forDownload(out directoryLocal);
 
                                 if (result) // место выбрано
@@ -207,6 +203,7 @@ namespace FtpClient
                             bool result = true;
                             string fileNameLocal;
                             string fileNameRemote;
+                            Console.WriteLine("Выберите файл для загрузки на сервер в диалоговом окне...");
                             result = Program.forUpload(out fileNameLocal);
                             if (result)
                             {
