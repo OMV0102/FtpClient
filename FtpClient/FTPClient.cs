@@ -85,10 +85,6 @@ namespace FtpClient
         // сменить текущий каталог
         public bool changeDirectory(string newDirectory)
         {
-            if (!newDirectory.Contains("./")) 
-            {
-                newDirectory = this.getCurrentDirectory() + "/" + newDirectory;
-            }
             return this.ftpConnection.ChangeWorkingDirectory(newDirectory);
         }
 
@@ -112,8 +108,14 @@ namespace FtpClient
         {
             if (Directory.Length < 1)
                 return false;
-
-            this.ftpConnection.DeleteDirectory(Directory);
+            try
+            {
+                this.ftpConnection.DeleteDirectory(Directory);
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
 
             return true;
         }
@@ -147,8 +149,14 @@ namespace FtpClient
 
             //if (!remoteFile.Contains("./"))
             //    remoteFile = this.getCurrentDirectory() + "/"+ remoteFile;
-
-            this.ftpConnection.UploadFile(localFile, remoteFile); // перезаписать файл
+            try
+            {
+                this.ftpConnection.UploadFile(localFile, remoteFile); // перезаписать файл
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
             return true;
         }
 
