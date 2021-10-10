@@ -70,7 +70,7 @@ namespace FtpClient
         // получить список файлов в текущем каталоге
         public string[] getListFiles()
         {
-            return this.ftpConnection.GetFiles(this.getCurrentDirectory(), true);
+            return this.ftpConnection.GetFiles(this.getCurrentDirectory(), false);
         }
 
         // получить список файлов в указанном каталоге
@@ -171,8 +171,8 @@ namespace FtpClient
             if (localFile.Length < 1 || remoteFile.Length < 1)
                 return false;
 
-            if (!remoteFile.Contains("./"))
-                remoteFile = this.getCurrentDirectory() + "/" + remoteFile;
+            //if (!remoteFile.Contains("./"))
+            //    remoteFile = this.getCurrentDirectory() + "/" + remoteFile;
 
             this.ftpConnection.DownloadFile(localFile, remoteFile);
             return true;
